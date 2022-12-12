@@ -6,11 +6,9 @@ import {
   statelessSessions,
 } from '@keystone-next/keystone/session';
 import { User } from './schemas/User';
+import { Product } from './schemas/Product';
 
 const databaseURL = process.env.DATABASE_URL || 'local-db-url';
-
-console.log('DATABASE URL');
-console.log(databaseURL);
 
 const sessionConfig = {
   maxAge: 60 * 60 * 24 * 360,
@@ -39,12 +37,9 @@ export default withAuth(
       adapter: 'mongoose',
       url: databaseURL,
     },
-    lists: createSchema({ User }),
+    lists: createSchema({ User, Product }),
     ui: {
-      isAccessAllowed: ({ session }) => {
-        console.log(session);
-        return !!session?.data;
-      },
+      isAccessAllowed: ({ session }) => !!session?.data,
     },
     session: withItemData(statelessSessions(sessionConfig), { User: 'id' }),
   })
