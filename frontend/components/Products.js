@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 import styled from 'styled-components';
 import Product from './Product';
 
-const ALL_PRODUCTS_QUERY = gql`
+export const ALL_PRODUCTS_QUERY = gql`
   query ALL_PRODUCTS_QUERY {
     allProducts {
       id
@@ -35,7 +35,7 @@ export default function Products() {
   return (
     <div>
       <ProductsListStyles>
-        {data.allProducts.map((p) => (
+        {data?.allProducts.map((p) => (
           <Product key={p.id} product={p}>
             {p.name}
           </Product>
