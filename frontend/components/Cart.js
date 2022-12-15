@@ -55,7 +55,7 @@ export default function Cart() {
       <header>
         <Supreme>{user.name}'s Cart</Supreme>
         <CloseButton type="button" onClick={() => closeCart()}>
-          Close
+          &times;
         </CloseButton>
       </header>
       <ul>
