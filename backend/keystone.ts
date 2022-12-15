@@ -9,6 +9,7 @@ import { User } from './schemas/User';
 import { Product } from './schemas/Product';
 import { ProductImage } from './schemas/ProductImage';
 import { insertSeedData } from './seed-data';
+import { sendPasswordEmail } from './lib/mail';
 
 const databaseURL = process.env.DATABASE_URL || 'local-db-url';
 
@@ -23,6 +24,11 @@ const { withAuth } = createAuth({
   secretField: 'password',
   initFirstItem: {
     fields: ['name', 'email', 'password'],
+  },
+  passwordResetLink: {
+    async sendToken(args) {
+      await sendPasswordEmail(args.token, args.identity);
+    },
   },
   // todo: add roles
 });
