@@ -3,13 +3,16 @@ import { ApolloProvider } from '@apollo/client';
 import Page from '../components/Page';
 import 'nprogress/nprogress.css';
 import withData from '../lib/withData';
+import { CartStateProvider } from '../lib/cartState';
 
 function MyApp({ Component, pageProps, apollo }) {
   return (
     <ApolloProvider client={apollo}>
-      <Page cool="some test">
-        <Component {...pageProps} />
-      </Page>
+      <CartStateProvider>
+        <Page cool="some test">
+          <Component {...pageProps} />
+        </Page>
+      </CartStateProvider>
     </ApolloProvider>
   );
 }
