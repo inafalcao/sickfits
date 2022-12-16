@@ -2,15 +2,18 @@ import { useLazyQuery } from '@apollo/client';
 import { resetIdCounter, useCombobox } from 'downshift';
 import gql from 'graphql-tag';
 import debounce from 'lodash.debounce';
+import { useRouter } from 'next/dist/client/router';
 import { DropDown, DropDownItem, SearchStyles } from './styles/DropDown';
 
 const SEARCH_PRODUCTS_QUERY = gql`
-  query SEARCH_PRODUCTS_QUERY($searchTerms: String!) {
-    searchTerms: allProducts(where: 
-    OR: [
-      { name_contains_i: $searchTerms },
-      { description_contains_i: $searchTerms }
-    ] 
+  query SEARCH_PRODUCTS_QUERY($searchTerm: String!) {
+    searchTerms: allProducts(
+      where: {
+        OR: [
+          { name_contains_i: $searchTerm }
+          { description_contains_i: $searchTerm }
+        ]
+      }
     ) {
       id
       name
@@ -24,27 +27,40 @@ const SEARCH_PRODUCTS_QUERY = gql`
 `;
 
 export default function Search() {
+  const router = useRouter();
+
   const [findItems, { loading, data, query }] = useLazyQuery(
     SEARCH_PRODUCTS_QUERY,
     {
       fetchPolicy: 'no-cache',
     }
   );
-  const debouncedFindItems = () => {
-    console.log('debounced');
-    debounce(findItems, 350);
-  };
+  const items = data?.searchTerms || [];
+  const debouncedFindItems = debounce(findItems, 350);
   resetIdCounter();
 
-  const { getMenuProps, getInputProps, getComboboxProps } = useCombobox({
-    items: [],
+  const {
+    isOpen,
+    getMenuProps,
+    getInputProps,
+    getComboboxProps,
+    highlightedIndex,
+    getItemProps,
+    inputValue,
+  } = useCombobox({
+    items,
     onInputValueChange() {
-      console.log('Input change');
-      debouncedFindItems();
+      debouncedFindItems({
+        variables: {
+          searchTerm: inputValue,
+        },
+      });
     },
-    onSelectedItemChange() {
+    onSelectedItemChange({ selectedItem }) {
+      router.push(`/product/${selectedItem.id}`);
       console.log('Selected Item change');
     },
+    itemToString: (item) => item?.name || '',
   });
 
   return (
@@ -55,12 +71,28 @@ export default function Search() {
             type: 'search',
             placeholder: 'Search for an Item',
             id: 'search',
-            className: 'loading',
+            className: loading ? 'loading' : '',
           })}
         />
       </div>
       <DropDown {...getMenuProps()}>
-        <DropDownItem>Hei</DropDownItem>
+        {isOpen &&
+          items.map((item, index) => (
+            <DropDownItem
+              {...getItemProps({ item })}
+              highlighted={index === highlightedIndex}
+            >
+              <img
+                src={item.photo?.image?.publicUrlTransformed}
+                alt={item.name}
+                width="50"
+              />
+              {item.name}
+            </DropDownItem>
+          ))}
+        {isOpen && !items.length && !loading && (
+          <DropDownItem>No items found for {inputValue}</DropDownItem>
+        )}
       </DropDown>
     </SearchStyles>
   );
