@@ -1,18 +1,17 @@
 import { createAuth } from '@keystone-next/auth';
-import { config, createSchema, list } from '@keystone-next/keystone/schema';
+import { config, createSchema } from '@keystone-next/keystone/schema';
 import 'dotenv/config';
 import {
   withItemData,
   statelessSessions,
 } from '@keystone-next/keystone/session';
-import { integer, relationship, select, text } from '@keystone-next/fields';
-import { isResSent } from 'next/dist/next-server/lib/utils';
 import { User } from './schemas/User';
 import { Product } from './schemas/Product';
 import { ProductImage } from './schemas/ProductImage';
 import { CartItem } from './schemas/CartItem';
 import { insertSeedData } from './seed-data';
 import { sendPasswordEmail } from './lib/mail';
+import { extendGraphqlSchema } from './mutations';
 
 const databaseURL = process.env.DATABASE_URL || 'local-db-url';
 
@@ -54,25 +53,10 @@ export default withAuth(
       },
     },
     lists: createSchema({ User, Product, ProductImage, CartItem }),
+    extendGraphqlSchema,
     ui: {
       isAccessAllowed: ({ session }) => !!session?.data,
     },
     session: withItemData(statelessSessions(sessionConfig), { User: 'id' }),
   })
 );
-
-export const CartItem = list({
-  ui: {
-    listView: {
-      initialColumns: ['product', 'quantity', 'user'],
-    },
-  },
-  fields: {
-    quantity: integer({
-      defaultValue: 1,
-      isRequired: true,
-    }),
-    product: relationship({ ref: 'Product' }),
-    user: relationship({ ref: 'User.cart' }),
-  },
-});

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { useCart } from '../lib/cartState';
 import useUser from '../lib/useUser';
+import CartCount from './CartCount';
 import NavStyles from './styles/NavStyles';
 
 export default function Nav() {
@@ -20,6 +21,9 @@ export default function Nav() {
           </button>
           <button type="button" onClick={() => openCart()}>
             My Cart
+            <CartCount
+              count={user.cart.reduce((acc, item) => acc + item.quantity, 0)}
+            />
           </button>
         </>
       )}
