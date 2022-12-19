@@ -2,7 +2,7 @@ import { useQuery } from '@apollo/client';
 import gql from 'graphql-tag';
 import Head from 'next/head';
 import styled from 'styled-components';
-import { Link } from 'next/link';
+import Link from 'next/link';
 import DisplayError from '../components/ErrorMessage';
 import OrderStyles from '../components/styles/OrderStyles';
 import formatMoney from '../lib/formatMoney';
@@ -39,6 +39,10 @@ const OrderUl = styled.ul`
   grid-gap: 4rem;
 `;
 
+function countItemsInAnOrder(order) {
+  return order.items.reduce((tally, item) => tally + item.quantity, 0);
+}
+
 export default function OrdersPage() {
   const { data, error, loading } = useQuery(USER_ORDERS_QUERY);
 
@@ -54,10 +58,26 @@ export default function OrdersPage() {
       <OrderUl>
         {allOrders.map((order) => (
           <OrderItemStyles>
-            <Link href={`/order/${order.div}`}>
-              <div className="order-meta">
-                <p>{formatMoney(order.total)}</p>
-              </div>
+            <Link href={`/order/${order.id}`}>
+              <a>
+                <div className="order-meta">
+                  <p>{countItemsInAnOrder(order)} Items</p>
+                  <p>
+                    {order.items.length} Product{' '}
+                    {order.items.length === 1 ? '' : 's'}
+                  </p>
+                  <p>{formatMoney(order.total)}</p>
+                </div>
+                <div className="images">
+                  {order.items.map((item) => (
+                    <img
+                      key={`image-${item.id}`}
+                      src={item.photo?.image.publicUrlTransformed}
+                      alt={item.name}
+                    />
+                  ))}
+                </div>
+              </a>
             </Link>
           </OrderItemStyles>
         ))}

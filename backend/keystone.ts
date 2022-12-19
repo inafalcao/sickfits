@@ -11,9 +11,11 @@ import { Order } from './schemas/Order';
 import { ProductImage } from './schemas/ProductImage';
 import { OrderItem } from './schemas/OrderItem';
 import { CartItem } from './schemas/CartItem';
+import { Role } from './schemas/Role';
 import { insertSeedData } from './seed-data';
 import { sendPasswordEmail } from './lib/mail';
 import { extendGraphqlSchema } from './mutations';
+import { permissionsList } from './schemas/files';
 
 const databaseURL = process.env.DATABASE_URL || 'local-db-url';
 
@@ -61,11 +63,21 @@ export default withAuth(
       CartItem,
       OrderItem,
       Order,
+      Role,
     }),
     extendGraphqlSchema,
     ui: {
       isAccessAllowed: ({ session }) => !!session?.data,
     },
-    session: withItemData(statelessSessions(sessionConfig), { User: 'id' }),
+    session: withItemData(statelessSessions(sessionConfig), {
+      User: `
+        id
+        name
+        email
+        role {
+          ${permissionsList.join(' ')}
+        }
+      `,
+    }),
   })
 );
