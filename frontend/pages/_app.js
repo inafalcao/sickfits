@@ -1,9 +1,14 @@
 import NProgress from 'nprogress';
 import { ApolloProvider } from '@apollo/client';
 import Page from '../components/Page';
-import 'nprogress/nprogress.css';
+import '../components/styles/nprogress.css';
 import withData from '../lib/withData';
 import { CartStateProvider } from '../lib/cartState';
+import Router from 'next/router';
+
+Router.events.on('routeChangeStart', () => NProgress.start());
+Router.events.on('routeChangeComplete', () => NProgress.done());
+Router.events.on('routeChangeError', () => NProgress.done());
 
 function MyApp({ Component, pageProps, apollo }) {
   return (
