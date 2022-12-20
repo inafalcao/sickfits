@@ -32,6 +32,30 @@ export const rules = {
     // If it does not find anything, means FALSE
     return { user: { id: session.itemId } };
   },
+  canOrder({ session }: ListAccessArgs) {
+    if (!isSignedIn({ session })) {
+      return false;
+    }
+
+    if (permissions.canManageCart({ session })) {
+      return true;
+    }
+
+    // This will bind to a where graphql api clause
+    // Return a where filter
+    // If it does not find anything, means FALSE
+    return { user: { id: session.itemId } };
+  },
+  canManageOrderItems({ session }: ListAccessArgs) {
+    if (permissions.canManageCart({ session })) {
+      return true;
+    }
+
+    // This will bind to a where graphql api clause
+    // Return a where filter
+    // If it does not find anything, means FALSE
+    return { order: { user: { id: session.itemId } } };
+  },
   canReadProducts({ session }: ListAccessArgs) {
     if (permissions.canManageProducts({ session })) {
       return true;
