@@ -12,7 +12,11 @@ const ADD_TO_CART_MUTATION = gql`
 `;
 
 export default function AddToCart({ id }) {
-  const { openCart } = useCart();
+  const cart = useCart();
+
+  if (!cart) return '';
+
+  const { openCart } = cart;
 
   const [addToCart, { loading }] = useMutation(ADD_TO_CART_MUTATION, {
     variables: { productId: id },
