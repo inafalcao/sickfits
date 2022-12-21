@@ -23,6 +23,5 @@ describe('<CartCount/>', () => {
     expect(container.textContent).toBe('12');
 
     expect(container).toMatchSnapshot();
-    debug();
   });
 });
