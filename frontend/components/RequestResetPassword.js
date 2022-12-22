@@ -6,7 +6,7 @@ import useForm from '../lib/useForm';
 import { CURRENT_USER_QUERY } from '../lib/useUser';
 import DisplayError from './ErrorMessage';
 
-const REQUEST_RESET_MUTATION = gql`
+export const REQUEST_RESET_MUTATION = gql`
   mutation REQUEST_RESET_MUTATION($email: String!) {
     sendUserPasswordResetLink(email: $email) {
       code
@@ -16,7 +16,7 @@ const REQUEST_RESET_MUTATION = gql`
 `;
 
 export default function RequestResetPassword() {
-  const { inputs, handleChange, resetForm } = useForm({ email: '' });
+  const { inputs, handleChange } = useForm({ email: '' });
 
   const [sendUserPasswordResetLink, { loading, data, error }] = useMutation(
     REQUEST_RESET_MUTATION,
